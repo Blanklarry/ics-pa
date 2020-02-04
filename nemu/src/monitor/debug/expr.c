@@ -151,7 +151,7 @@ static bool make_token(char *e) {
     }
 
     if (nr_token > TOKEN_ARRAY_LEN) {
-      printf("out of range: tokens[%u]", TOKEN_ARRAY_LEN);
+      printf("out of range: tokens[%lu]", TOKEN_ARRAY_LEN);
       return false;
     }
   }
