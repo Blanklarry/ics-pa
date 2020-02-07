@@ -7,8 +7,14 @@ make_EHelper(add) {
 }
 
 make_EHelper(sub) {
-  TODO();
-
+  // TODO();
+  s0 = id_src->val;
+  if (id_dest->width > id_src->width) {
+    rtl_sext(&s0, &id_src->val, id_dest->width);
+  }
+  rtl_sub(&s0, &id_dest->val, &s0);
+  operand_write(id_dest, &s0);
+  rtl_update_ZFSF(&id_dest->val, id_dest->width);
   print_asm_template2(sub);
 }
 

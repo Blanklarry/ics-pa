@@ -24,15 +24,20 @@ make_EHelper(jmp_rm) {
   print_asm("jmp *%s", id_dest->str);
 }
 
+// tag: TODO(), width can be 2, ignore this for the moment.
 make_EHelper(call) {
   // the target address is calculated at the decode stage
-  TODO();
+  // TODO();
+  rtl_push(&decinfo.seq_pc);
+  rtl_j(decinfo.jmp_pc);
 
   print_asm("call %x", decinfo.jmp_pc);
 }
 
 make_EHelper(ret) {
-  TODO();
+  // TODO();
+  rtl_pop(&decinfo.jmp_pc);
+  rtl_j(decinfo.jmp_pc);
 
   print_asm("ret");
 }

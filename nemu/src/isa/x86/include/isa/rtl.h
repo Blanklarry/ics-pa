@@ -23,16 +23,19 @@ static inline void rtl_sr(int r, const rtlreg_t* src1, int width) {
   }
 }
 
+// tag: TODO(), width can be 2, ignore this for the moment.
 static inline void rtl_push(const rtlreg_t* src1) {
   // esp <- esp - 4
+  rtl_subi(&reg_l(R_ESP), &reg_l(R_ESP),4);
   // M[esp] <- src1
-  TODO();
+  rtl_sm(&reg_l(R_ESP), src1, 4);
 }
 
 static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
+  rtl_lm(dest, &reg_l(R_ESP), 4);
   // esp <- esp + 4
-  TODO();
+  rtl_addi(&reg_l(R_ESP), &reg_l(R_ESP), 4);
 }
 
 static inline void rtl_is_sub_overflow(rtlreg_t* dest,
@@ -61,10 +64,10 @@ static inline void rtl_is_add_carry(rtlreg_t* dest,
 
 #define make_rtl_setget_eflags(f) \
   static inline void concat(rtl_set_, f) (const rtlreg_t* src) { \
-    TODO(); \
+    set_reg_flag(concat(F_, f), *src); /* TODO(); */ \
   } \
   static inline void concat(rtl_get_, f) (rtlreg_t* dest) { \
-    TODO(); \
+    *dest = reg_flag(concat(F_, f)); /* TODO(); */ \
   }
 
 make_rtl_setget_eflags(CF)
@@ -72,14 +75,23 @@ make_rtl_setget_eflags(OF)
 make_rtl_setget_eflags(ZF)
 make_rtl_setget_eflags(SF)
 
+// Zero Flag -- Set if result is zero; cleared otherwise.
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
   // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
-  TODO();
+  // TODO();
+  if (*result & (~0u >> ((4 - width) << 3))) {
+    set_reg_flag(F_ZF, 0);
+  }
+  else {
+    set_reg_flag(F_ZF, 1);
+  }
 }
 
+// Sign Flag -- Set equal to high-order bit of result (0 is positive, 1 if negative).
 static inline void rtl_update_SF(const rtlreg_t* result, int width) {
   // eflags.SF <- is_sign(result[width * 8 - 1 .. 0])
-  TODO();
+  // TODO();
+  set_reg_flag(F_SF, (*result >> ((width << 3) - 1)) & 1);
 }
 
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {

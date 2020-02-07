@@ -78,4 +78,16 @@ make_DHelper(in_dx2a);
 make_DHelper(out_a2I);
 make_DHelper(out_a2dx);
 
+make_DHelper(call_rel);
+make_DHelper(ret);
+
+make_DHelper(xor);
+// make_DHelper(sub_sign_ext);
+
+
+make_DHelper(push_reg);
+make_DHelper(push_imm);
+
+make_DHelper(pop_reg);
+
 #endif
