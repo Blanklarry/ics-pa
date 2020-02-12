@@ -9,7 +9,6 @@ enum { R_EAX, R_ECX, R_EDX, R_EBX, R_ESP, R_EBP, R_ESI, R_EDI };
 enum { R_AX, R_CX, R_DX, R_BX, R_SP, R_BP, R_SI, R_DI };
 enum { R_AL, R_CL, R_DL, R_BL, R_AH, R_CH, R_DH, R_BH };
 
-enum { F_CF=0, F_PF=2, F_AF=4, F_ZF=6, F_SF=7, F_OF=11 };
 /* TODO: Re-organize the `CPU_state' structure to match the register
  * encoding scheme in i386 instruction format. For example, if we
  * access cpu.gpr[3]._16, we will get the `bx' register; if we access
@@ -37,9 +36,34 @@ typedef struct {
    */
   // rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
   
-  vaddr_t pc;
+  union {
+    vaddr_t pc;
+    vaddr_t eip;
+  };
 
-  rtlreg_t eflags;
+	union {
+		struct {
+			rtlreg_t _CF :1;
+			rtlreg_t _dummy0 :1;
+			rtlreg_t _PF :1;
+			rtlreg_t _dummy1 :1;
+			rtlreg_t _AF :1;
+			rtlreg_t _dummy2: 1;
+			rtlreg_t _ZF :1;
+			rtlreg_t _SF :1;
+			rtlreg_t _TF :1;
+			rtlreg_t _IF :1;
+			rtlreg_t _DF :1;
+			rtlreg_t _OF :1;
+			rtlreg_t _OLIP :2;
+			rtlreg_t _NT :1;
+			rtlreg_t _dummy3 :1;
+			rtlreg_t _RF :1;
+			rtlreg_t _VM :1;
+			rtlreg_t _dummy4 :14;
+		};
+		rtlreg_t val;	
+	} eflags;
 
 } CPU_state;
 
@@ -55,9 +79,7 @@ static inline int check_reg_index(int index) {
 // tag: TODO() should check idx and v (Macros may not be available, should declare a func)
 // idx: refer to enum
 // v: 0 or 1
-#define reg_flag(idx) ((cpu.eflags >> idx) & 1)
-#define set_reg_flag(idx, v) (cpu.eflags |= ((!!v) << idx))
-
+#define reg_flag(f) concat(cpu.eflags._, f)
 
 static inline const char* reg_name(int index, int width) {
   extern const char* regsl[];

@@ -53,7 +53,7 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "si [n] - Single step N instructions, N default 1", cmd_si_n },
-  { "info", "info SUBCMD - Print program states, SUBCMD: r(reg) or w(watchpoint)", cmd_info_subcmd },
+  { "info", "info SUBCMD - Print program states, SUBCMD: r(reg) or w(watchpoint) or f(eflags)", cmd_info_subcmd },
   { "p", "p EXPR - Calculate value of EXPR", cmd_p_expr },
   { "x", "x N EXPR - Scand memory, take EXPR value as the starting memory address, and output N consecutive 4 bytes in hexadecimal form", cmd_x_n_expr },
   { "w", "w EXPR - Set watchpoint, when value of EXPR has changed, stop the program", cmd_w_expr },
@@ -98,7 +98,7 @@ static int cmd_si_n(char *args) {
   return 0;
 }
 
-static char cmd_info_subcmd_usage[] = "Usage: info SUBCMD, SUBCMD: r(reg) or w(watchpoint)";
+static char cmd_info_subcmd_usage[] = "Usage: info SUBCMD, SUBCMD: r(reg) or w(watchpoint) or f(eflags)";
 static int cmd_info_subcmd(char *args) {
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
@@ -115,6 +115,10 @@ static int cmd_info_subcmd(char *args) {
     }
     else if (strcmp(arg, "w") == 0 || strcmp(arg, "watchpoint") == 0) {
       display_wp();
+    }
+    else if (strcmp(arg, "f") == 0 || strcmp(arg, "eflags") == 0) {
+      extern void isa_eflags_display(void);
+      isa_eflags_display();
     }
     else {
       printf("Unknown command info '%s'\n%s\n", arg, cmd_info_subcmd_usage);
