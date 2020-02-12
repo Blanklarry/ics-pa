@@ -130,31 +130,40 @@ void interpret_rtl_exit(int state, vaddr_t halt_pc, uint32_t halt_ret);
 
 /* RTL pseudo instructions */
 
+static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
+  // dest <- src1[width * 8 - 1]
+  // TODO();
+  // most significant bit (MSB)
+  *dest = 0x1 & ((*src1) >> (width * 8 - 1));
+}
+
 static inline void rtl_not(rtlreg_t *dest, const rtlreg_t* src1) {
   // dest <- ~src1
-  TODO();
+  // TODO();
+  *dest = ~(*src1);
 }
 
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
   // TODO();
-  *dest = *src1;
-  t0 = (*src1 >> (width * 8 - 1)) & 1;
+  rtl_msb(&t0, src1, width);
   if (t0) {
     switch (width) {
-      case 1: *dest |= 0xffffff00; break;
-      case 2: *dest |= 0x0000ff00; break;
-      /* case 4: */
-      default: break;
+      case 1: rtl_li(&t1, 0xffffff00); break;
+      case 2: rtl_li(&t1, 0xffff0000); break;
+      case 4: rtl_li(&t1, 0x00000000); break;
+      default: assert(0);
     }
+    rtl_or(dest, src1, &t1);
   }
   else {
     switch (width) {
-      case 1: *dest &= 0x000000ff; break;
-      case 2: *dest &= 0x0000ffff; break;
-      /* case 4: */
-      default: break;
+      case 1: rtl_li(&t1, 0x000000ff); break;
+      case 2: rtl_li(&t1, 0x0000ffff); break;
+      case 4: rtl_li(&t1, 0xffffffff); break;
+      default: assert(0);
     }
+    rtl_and(dest, src1, &t1);
   }
 }
 
@@ -164,14 +173,11 @@ static inline void rtl_setrelopi(uint32_t relop, rtlreg_t *dest,
   rtl_setrelop(relop, dest, src1, &ir);
 }
 
-static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
-  // dest <- src1[width * 8 - 1]
-  TODO();
-}
 
 static inline void rtl_mux(rtlreg_t* dest, const rtlreg_t* cond, const rtlreg_t* src1, const rtlreg_t* src2) {
   // dest <- (cond ? src1 : src2)
-  TODO();
+  // TODO();
+  *dest = (*cond) ? (*src1) : (*src2);
 }
 
 #include "isa/rtl.h"
