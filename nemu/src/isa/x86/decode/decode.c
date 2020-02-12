@@ -15,6 +15,7 @@ static inline make_DopHelper(I) {
   print_Dop(op->str, OP_STR_SIZE, "$0x%x", op->imm);
 }
 
+// hjx-comment: maybe: if need to sign-ext, use decode_op_SI not decode_op_I
 /* I386 manual does not contain this abbreviation, but it is different from
  * the one above from the view of implementation. So we use another helper
  * function to decode it.
@@ -33,8 +34,10 @@ static inline make_DopHelper(SI) {
    */
   // TODO();
   op->imm = instr_fetch(pc, op->width);
+  if (op->width == 1 && (op->imm >> 7) == 1) {
+    op->imm |= 0xffffff00;
+  }
   op->simm = *(int32_t*)(&op->imm);
-
   rtl_li(&op->val, op->simm);
 
   print_Dop(op->str, OP_STR_SIZE, "$0x%x", op->simm);
@@ -312,24 +315,4 @@ make_DHelper(call_rel) {
   decode_op_SI(pc, id_dest, true);
   // the target address can be computed in the decode stage
   decinfo.jmp_pc = id_dest->simm + *pc;  
-}
-
-make_DHelper(xor) {
-  decode_G2E(pc);
-}
-
-make_DHelper(push_reg) {
-  decode_op_r(pc, id_dest, true);
-}
-
-make_DHelper(push_imm) {
-  decode_op_I(pc, id_dest, true);
-}
-
-make_DHelper(pop_reg) {
-  decode_op_r(pc, id_dest, true);
-}
-
-make_DHelper(sub_sign_ext) {
-
 }
