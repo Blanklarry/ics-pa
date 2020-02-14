@@ -20,6 +20,7 @@ static SDL_Texture *texture = NULL;
 
 static uint32_t (*vmem) [SCREEN_W] = NULL;
 static uint32_t *screensize_port_base = NULL;
+static uint32_t *screensync = NULL;
 
 static inline void update_screen() {
   SDL_UpdateTexture(texture, NULL, vmem, SCREEN_W * sizeof(vmem[0][0]));
@@ -30,7 +31,10 @@ static inline void update_screen() {
 
 static void vga_io_handler(uint32_t offset, int len, bool is_write) {
   // TODO: call `update_screen()` when writing to the sync register
-  TODO();
+  // TODO();
+  if (is_write) {
+    update_screen();
+  }
 }
 
 void init_vga() {
@@ -47,6 +51,10 @@ void init_vga() {
   screensize_port_base[0] = ((SCREEN_W) << 16) | (SCREEN_H);
   add_pio_map("screen", SCREEN_PORT, (void *)screensize_port_base, 8, vga_io_handler);
   add_mmio_map("screen", SCREEN_MMIO, (void *)screensize_port_base, 8, vga_io_handler);
+
+  screensync = (void *)new_space(4);
+  add_pio_map("screen-sync", SYNC_PORT, (void*)screensync, 4, vga_io_handler);
+  add_mmio_map("screen-sync", SYNC_MMIO, (void*)screensync, 4, vga_io_handler);
 
   vmem = (void *)new_space(0x80000);
   add_mmio_map("vmem", VMEM, (void *)vmem, 0x80000, NULL);

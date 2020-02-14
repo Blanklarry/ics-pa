@@ -18,6 +18,7 @@ f(LSHIFT) f(Z) f(X) f(C) f(V) f(B) f(N) f(M) f(COMMA) f(PERIOD) f(SLASH) f(RSHIF
 f(LCTRL) f(APPLICATION) f(LALT) f(SPACE) f(RALT) f(RCTRL) \
 f(UP) f(DOWN) f(LEFT) f(RIGHT) f(INSERT) f(DELETE) f(HOME) f(END) f(PAGEUP) f(PAGEDOWN)
 
+// hjx-comment: end with a ',', so it can declare enum correctly
 #define _KEY_NAME(k) _KEY_##k,
 
 enum {
@@ -25,6 +26,7 @@ enum {
   MAP(_KEYS, _KEY_NAME)
 };
 
+// hjx-comment: end with a ',', so it can declare keymap correctly
 #define SDL_KEYMAP(k) [concat(SDL_SCANCODE_, k)] = concat(_KEY_, k),
 static uint32_t keymap[256] = {
   MAP(_KEYS, SDL_KEYMAP)
