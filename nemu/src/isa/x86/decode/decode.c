@@ -310,9 +310,3 @@ void operand_write(Operand *op, rtlreg_t* src) {
   else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, src, op->width); }
   else { assert(0); }
 }
-
-make_DHelper(call_rel) {
-  decode_op_SI(pc, id_dest, true);
-  // the target address can be computed in the decode stage
-  decinfo.jmp_pc = id_dest->simm + *pc;  
-}

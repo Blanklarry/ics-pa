@@ -42,13 +42,28 @@ void pio_write_w(ioaddr_t, uint32_t);
 void pio_write_b(ioaddr_t, uint32_t);
 
 make_EHelper(in) {
-  TODO();
-
+  // TODO();
+  switch (id_dest->width) {
+    case 1: s0 = pio_read_b(id_src->val); break;
+    case 2: s0 = pio_read_w(id_src->val); break;
+    case 4: s0 = pio_read_l(id_src->val); break;
+    default: assert(0);
+  }
+  operand_write(id_dest, &s0);
   print_asm_template2(in);
 }
 
+// hjx-comment:
+//   in i386 manual, whether byte, word, or dword, all read from AL,
+//   so, you do not need to switch(id_src->width)
 make_EHelper(out) {
-  TODO();
-
+  // TODO();
+  // switch (id_src->width) {
+  //   case 1: pio_write_b(id_dest->val, id_src->val); break;
+  //   case 2: pio_write_w(id_dest->val, id_src->val); break;
+  //   case 4: pio_write_l(id_dest->val, id_src->val); break;
+  //   default: assert(0);
+  // }
+  pio_write_b(id_dest->val, id_src->val);
   print_asm_template2(out);
 }
