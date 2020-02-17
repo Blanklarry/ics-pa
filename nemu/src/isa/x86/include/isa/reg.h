@@ -36,6 +36,13 @@ typedef struct {
    */
   // rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
   
+  // use in trap
+  vaddr_t cs;  // PA don't use cs, just for DiffTest(PA3, in trap)
+  struct {
+    uint16_t limit;
+    vaddr_t base;
+  } idtr;
+
   union {
     vaddr_t pc;
     vaddr_t eip;

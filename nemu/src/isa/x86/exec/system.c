@@ -1,7 +1,12 @@
 #include "cpu/exec.h"
 
 make_EHelper(lidt) {
-  TODO();
+  // TODO();
+  rtl_lm(&s0, &id_dest->addr, 2);
+  cpu.idtr.limit = s0;
+  rtl_addi(&s1, &id_dest->addr, 2);
+  rtl_lm(&s0, &s1, 4);
+  cpu.idtr.base = s0;
 
   print_asm_template1(lidt);
 }
@@ -20,8 +25,10 @@ make_EHelper(mov_cr2r) {
   difftest_skip_ref();
 }
 
+extern void raise_intr(uint32_t NO, vaddr_t ret_addr);
 make_EHelper(int) {
-  TODO();
+  // TODO();
+  raise_intr(id_dest->val, decinfo.seq_pc);
 
   print_asm("int %s", id_dest->str);
 
@@ -29,8 +36,11 @@ make_EHelper(int) {
 }
 
 make_EHelper(iret) {
-  TODO();
-
+  // TODO();
+  rtl_pop(&decinfo.jmp_pc);
+  rtl_pop(&cpu.cs);
+  rtl_pop(&cpu.eflags.val);
+  rtl_j(decinfo.jmp_pc);
   print_asm("iret");
 }
 
