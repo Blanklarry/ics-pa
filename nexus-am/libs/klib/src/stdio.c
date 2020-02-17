@@ -9,6 +9,7 @@ char out_str[81]; // why 81? because word wrap column always 80, so I'm assuming
 char pad_ch = ' ';
 char pad_dir = 'r';
 int width = 0;
+char prefix_str[4] = {0}; // store "0x"/"0X"...
 
 // return offset of num_str, so the caller can access:
 //   num_str+offset       -- the real num_str
@@ -50,24 +51,28 @@ int uint2str(unsigned int u, int base, char is_upper) {
 
 void getfmtnumstr(const int offset_numstr) {
   // memset() ??
+  int prefix_len = strlen(prefix_str);
+  if (prefix_len != 0) {
+    strcpy(out_str, prefix_str);
+  }
   int numstr_len = LEN_num_str - offset_numstr - 1, i;
   if (width <= numstr_len) {
-    strcpy(out_str, num_str+offset_numstr);
+    strcpy(out_str+prefix_len, num_str+offset_numstr);
     return;
   }
   if (pad_dir == 'r') {
     for (i = 0; i < width-numstr_len; i++) {
-      out_str[i] = pad_ch;
+      out_str[i+prefix_len] = pad_ch;
     }
-    strcpy(out_str+i, num_str+offset_numstr);
+    strcpy(out_str+i+prefix_len, num_str+offset_numstr);
   }
   else {
-    strcpy(out_str, num_str+offset_numstr);
+    strcpy(out_str+prefix_len, num_str+offset_numstr);
     for (i = numstr_len; i < width+numstr_len; i++) {
-      out_str[i] = pad_ch;
+      out_str[i+prefix_len] = pad_ch;
     }
   }
-  out_str[width] = '\0';
+  out_str[width+prefix_len] = '\0';
 }
 
 int parsewidth(const char *fmt) {
@@ -101,12 +106,12 @@ int parsefmt(const char *fmt, va_list *ap) {
 
   switch (fmt[offset]) {
     case '%': 
-      out_str[0] = '%'; 
-      out_str[1] = '\0'; 
+      out_str[0] = '%';
+      out_str[1] = '\0';
       break;
     case 'c':
       c = va_arg(*ap, int);
-      out_str[0] = c; 
+      out_str[0] = c;
       out_str[1] = '\0';
       break;
     case 'd': 
@@ -120,7 +125,28 @@ int parsefmt(const char *fmt, va_list *ap) {
     case 'u':
       u = va_arg(*ap, unsigned int);
       num_offset = uint2str(u, 10, 0);
-      break;      
+      break;
+    case 'p':
+      u = va_arg(*ap, unsigned int);
+      num_offset = uint2str(u, 16, 0);
+      strcpy(prefix_str, "0x");
+      break;
+    case '#':
+      if(fmt[offset+1] == 'x') {
+        strcpy(prefix_str, "0x");
+        u = va_arg(*ap, unsigned int);
+        num_offset = uint2str(u, 16, 0);
+      } 
+      else if (fmt[offset+1] == 'X') {
+        strcpy(prefix_str, "0X");
+        u = va_arg(*ap, unsigned int);
+        num_offset = uint2str(u, 16, 1);
+      }
+      else {
+        assert(0);
+      }
+      offset++;
+      break;
     case 'x': 
       u = va_arg(*ap, unsigned int);
       num_offset = uint2str(u, 16, 0);
@@ -130,7 +156,7 @@ int parsefmt(const char *fmt, va_list *ap) {
       num_offset = uint2str(u, 16, 1);
       break;
     case 's':
-      s = va_arg(*ap, char*); 
+      s = va_arg(*ap, char*);
       strcpy(out_str, s);
       break;
     // case '#':
@@ -144,7 +170,8 @@ int parsefmt(const char *fmt, va_list *ap) {
   pad_ch = ' ';
   pad_dir = 'r';
   width = 0;
-  return offset; 
+  prefix_str[0] = '\0';
+  return offset;
 }
 
 int _puts(const char *s) {
