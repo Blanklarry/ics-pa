@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #define Log(format, ...) \

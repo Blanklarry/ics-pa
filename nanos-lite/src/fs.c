@@ -14,7 +14,7 @@ typedef struct {
   WriteFn write;
 } Finfo;
 
-enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENT, FD_FB, FD_FBSYNC, FD_DISPINFO};
+enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENT, FD_FB, FD_FBSYNC, FD_DISPINFO, FD_TTY};
 
 size_t invalid_read(void *buf, size_t offset, size_t len) {
   panic("should not reach here");
@@ -37,6 +37,7 @@ static Finfo file_table[] __attribute__((used)) = {
   {"/dev/fb", 0, 0, 0, invalid_read, fb_write}, // should support lseek, so the size will init in fs.c#init_fs()
   {"/dev/fbsync", 0, 0, 0, invalid_read, fbsync_write},
   {"/proc/dispinfo", 0, 0, 0, dispinfo_read, invalid_write},
+  {"/dev/tty", 0, 0, 0, invalid_read, serial_write},
 #include "files.h"
 };
 
@@ -71,6 +72,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
     case FD_STDIN:
     case FD_FB:
     case FD_FBSYNC:
+    case FD_TTY:
       panic("Not support read in fd: %d", fd);
       break; 
     case FD_EVENT:
@@ -97,6 +99,7 @@ size_t fs_write(int fd, const void *buf, size_t len) {
     case FD_STDOUT:
     case FD_STDERR:
     case FD_FBSYNC:
+    case FD_TTY:
       ret_len = f->write(buf, 0, len);
       break; 
     case FD_FB:

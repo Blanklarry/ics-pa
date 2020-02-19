@@ -1,7 +1,7 @@
 #include "common.h"
 #include "syscall.h"
-#include <stdlib.h>
 #include "fs.h"
+#include "proc.h"
 
 uintptr_t sys_yield() {
   _yield();
@@ -9,7 +9,8 @@ uintptr_t sys_yield() {
 }
 
 uintptr_t sys_exit(_Context *c) {
-  _halt(c->GPR2);
+  // _halt(c->GPR2);
+  naive_uload(NULL, "/bin/init");
   return 0;
 }
 
@@ -26,8 +27,7 @@ uintptr_t sys_write(_Context *c) {
   return fs_write((int)c->GPR2, (char*)c->GPR3, c->GPR4);
 }
 
-extern char _end;
-uintptr_t pro_brk = (uintptr_t)&_end;
+static uintptr_t pro_brk = 0;
 uintptr_t sys_brk(_Context *c) {
   pro_brk = c->GPR2;
   return 0;
@@ -49,6 +49,11 @@ uintptr_t sys_lseek(_Context *c) {
   return fs_lseek((int)c->GPR2, c->GPR3, (int)c->GPR4);
 } 
 
+intptr_t sys_execve(_Context *c) {
+  naive_uload(NULL, (char*)c->GPR2);
+  return 0; // hjx-comment: in fact execve() does not return on success
+}
+
 _Context* do_syscall(_Context *c) {
   uintptr_t a[4];
   a[0] = c->GPR1;
@@ -62,6 +67,7 @@ _Context* do_syscall(_Context *c) {
     case SYS_read: Log("do_syscall: SYS_read"); c->GPRx = sys_read(c); break;
     case SYS_close: Log("do_syscall: SYS_close"); c->GPRx = sys_close(c); break;
     case SYS_lseek: Log("do_syscall: SYS_lseek"); c->GPRx = sys_lseek(c); break;
+    case SYS_execve: Log("do_syscall: SYS_execve"); c->GPRx = sys_execve(c); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 

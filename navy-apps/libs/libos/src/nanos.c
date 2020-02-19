@@ -63,11 +63,17 @@ int _write(int fd, void *buf, size_t count) {
 }
 
 extern char _end;
-uintptr_t pro_brk = (uintptr_t)&_end;
 void *_sbrk(intptr_t increment) {
-  uintptr_t oldbrk = pro_brk;
-  uintptr_t newbrk = oldbrk + increment;
-  if (_syscall_(SYS_brk, newbrk, 0, 0) != 0) {
+  /*
+   * hjx-comment: 
+   * Shall not use intptr_t to record the program break, 
+   * because the unit of increment is byte.
+   * If use intptr_t, +1 means +sizeof(intptr_t), error!
+  */
+  static char *pro_brk = &_end;
+  char *oldbrk = pro_brk; 
+  char *newbrk = oldbrk + increment;
+  if (_syscall_(SYS_brk, (intptr_t)newbrk, 0, 0) != 0) {
     return (void *)-1;
   }
   else {
@@ -88,9 +94,9 @@ off_t _lseek(int fd, off_t offset, int whence) {
   return _syscall_(SYS_lseek, fd, offset, whence);
 }
 
+// hjx-comment: in fact execve() does not return on success
 int _execve(const char *fname, char * const argv[], char *const envp[]) {
-  _exit(SYS_execve);
-  return 0;
+  return _syscall_(SYS_execve, (intptr_t)fname, (intptr_t)argv, (intptr_t)envp);
 }
 
 // The code below is not used by Nanos-lite.
