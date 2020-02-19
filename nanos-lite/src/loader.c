@@ -26,9 +26,9 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       fs_lseek(fd, pro_header.p_offset, SEEK_SET);
       fs_read(fd, (uint8_t*)pro_header.p_vaddr, pro_header.p_memsz);
       // hjx-comment:
-      // in general, FileSiz <= MemSize, else the (FileSiz - MemSize) is .bss
-      if (pro_header.p_vaddr < pro_header.p_filesz) {
-        memset((uint8_t*)(pro_header.p_vaddr+pro_header.p_filesz), 0, pro_header.p_filesz-pro_header.p_memsz);
+      // in general, FileSiz > MemSize, else the (FileSiz - MemSize) is .bss
+      if (pro_header.p_memsz > pro_header.p_filesz) {
+        memset((uint8_t*)(pro_header.p_vaddr+pro_header.p_filesz), 0, pro_header.p_memsz-pro_header.p_filesz);
       }
     }
     phoff += sizeof(Elf_Phdr);

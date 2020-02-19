@@ -8,6 +8,9 @@
 size_t serial_write(const void *buf, size_t offset, size_t len) {
   size_t cnt = 0;
   for (cnt = 0; cnt < len; cnt++) {
+    if (((char*)buf)[cnt] == '\0') {
+      break;
+    }
     _putc(((char*)buf)[cnt]);
   }
   return cnt;
@@ -49,7 +52,7 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
     real_len = 128 - offset;
   }
   strncpy(buf, dispinfo+offset, real_len);
-  return real_len;
+  return strlen(buf);
 }
 
 // hjx-comment:
@@ -70,7 +73,7 @@ size_t fb_write(const void *buf, size_t offset, size_t len) {
   int y = offset / 4 / w;
   int x = offset / 4 - y * w;
   draw_rect((uint32_t*)buf, x, y, real_len/4, 1);
-  return len;
+  return real_len;
 }
 
 size_t fbsync_write(const void *buf, size_t offset, size_t len) {
