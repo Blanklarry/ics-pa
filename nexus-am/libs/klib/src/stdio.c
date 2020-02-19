@@ -230,7 +230,28 @@ int sprintf(char *out, const char *fmt, ...) {
 }
 
 int snprintf(char *out, size_t n, const char *fmt, ...) {
-  return 0;
+  size_t nfmt = strlen(fmt), i = 0, j = 0;
+  va_list ap;
+  va_start(ap, fmt);
+  for (i = 0; i < nfmt; i++) {
+    if (fmt[i] != '%') {
+      out[j++] = fmt[i];
+    }
+    else {
+      if (i+1 >= nfmt) {
+        break;
+      }
+      i += parsefmt(fmt+i+1, &ap);
+      strcpy(out+j, out_str);
+      j += strlen(out_str);
+    }
+    if (j >= n-1) {
+      break;
+    }
+  }
+  va_end(ap);
+  out[j] = '\0';
+  return j;
 }
 
 #endif

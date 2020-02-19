@@ -28,15 +28,16 @@ char *strcpy(char* dst,const char* src) {
 }
 
 char* strncpy(char* dst, const char* src, size_t n) {  
+  if (src == NULL || dst == NULL) {
+    return dst;
+  }
   size_t i = 0;
   char *d = dst;
   while (i < n && *src != '\0') {
     *dst++ = *src++;
     i++;
   }
-  while (i < n) {
-    *dst++ = '\0';
-  }
+  *dst = '\0';
   return d;
 }
 
