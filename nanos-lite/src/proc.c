@@ -20,15 +20,26 @@ void hello_fun(void *arg) {
 }
 
 void init_proc() {
+  context_kload(&pcb[0], (void *)hello_fun);
+  context_uload(&pcb[1], "/bin/init");
+
   switch_boot_pcb();
 
-  Log("Initializing processes...");
+  // Log("Initializing processes...");
 
-  // load program here
-  naive_uload(NULL, "/bin/init");
+  // // load program here
+  // naive_uload(NULL, "/bin/init");
 
 }
 
 _Context* schedule(_Context *prev) {
-  return NULL;
+  // save the context pointer
+  current->cp = prev;
+
+  // always select pcb[0] as the new process
+  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  // current = &pcb[0];
+
+  // then return the new context
+  return current->cp;
 }
