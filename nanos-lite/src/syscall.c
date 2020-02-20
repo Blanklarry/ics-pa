@@ -21,7 +21,7 @@ uintptr_t sys_exit(_Context *c) {
  * in ics-pa-gitbook: printf() will try to malloc a buf to store the output str, 
  * if malloc error, then printf() will output char by char.
  * So, when you don't complete the heap management in pa3.2,
- * you will see hello test(if you Log sth) will output one char in one times.
+ * you will see hello test(if you Logdbg sth) will output one char in one times.
  */ 
 uintptr_t sys_write(_Context *c) {
   return fs_write((int)c->GPR2, (char*)c->GPR3, c->GPR4);
@@ -59,15 +59,15 @@ _Context* do_syscall(_Context *c) {
   a[0] = c->GPR1;
 
   switch (a[0]) {
-    case SYS_yield: Log("do_syscall: SYS_yield"); c->GPRx = sys_yield(); break;
-    case SYS_exit: Log("do_syscall: SYS_exit"); c->GPRx = sys_exit(c); break;
-    case SYS_write: Log("do_syscall: SYS_write"); c->GPRx = sys_write(c); break;
-    case SYS_brk: Log("do_syscall: SYS_brk"); c->GPRx = sys_brk(c); break;
-    case SYS_open: Log("do_syscall: SYS_open"); c->GPRx = sys_open(c); break;
-    case SYS_read: Log("do_syscall: SYS_read"); c->GPRx = sys_read(c); break;
-    case SYS_close: Log("do_syscall: SYS_close"); c->GPRx = sys_close(c); break;
-    case SYS_lseek: Log("do_syscall: SYS_lseek"); c->GPRx = sys_lseek(c); break;
-    case SYS_execve: Log("do_syscall: SYS_execve"); c->GPRx = sys_execve(c); break;
+    case SYS_yield: Logdbg("do_syscall: SYS_yield"); c->GPRx = sys_yield(); break;
+    case SYS_exit: Logdbg("do_syscall: SYS_exit"); c->GPRx = sys_exit(c); break;
+    case SYS_write: Logdbg("do_syscall: SYS_write"); c->GPRx = sys_write(c); break;
+    case SYS_brk: Logdbg("do_syscall: SYS_brk"); c->GPRx = sys_brk(c); break;
+    case SYS_open: Logdbg("do_syscall: SYS_open"); c->GPRx = sys_open(c); break;
+    case SYS_read: Logdbg("do_syscall: SYS_read"); c->GPRx = sys_read(c); break;
+    case SYS_close: Logdbg("do_syscall: SYS_close"); c->GPRx = sys_close(c); break;
+    case SYS_lseek: Logdbg("do_syscall: SYS_lseek"); c->GPRx = sys_lseek(c); break;
+    case SYS_execve: Logdbg("do_syscall: SYS_execve"); c->GPRx = sys_execve(c); break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 
