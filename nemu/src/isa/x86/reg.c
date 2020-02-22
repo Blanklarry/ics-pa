@@ -49,12 +49,12 @@ void isa_reg_display() {
 }
 
 void isa_eflags_display() {
-  printf(" +--------+----+----+----+----+\n");
-  printf(" | eflags | CF | ZF | SF | OF |\n");
-  printf(" +--------+----+----+----+----+\n");
-  printf(" |        |  %d |  %d |  %d |  %d |\n", 
-      reg_flag(CF), reg_flag(ZF), reg_flag(SF), reg_flag(OF));
-  printf(" +--------+----+----+----+----+\n");
+  printf(" +--------+----+----+----+----+----+\n");
+  printf(" | eflags | CF | ZF | SF | OF | IF |\n");
+  printf(" +--------+----+----+----+----+----+\n");
+  printf(" |        |  %d |  %d |  %d |  %d |  %d |\n", 
+      reg_flag(CF), reg_flag(ZF), reg_flag(SF), reg_flag(OF), reg_flag(IF));
+  printf(" +--------+----+----+----+----+----+\n");
 }
 
 uint32_t isa_reg_str2val(const char *s, bool *success) {

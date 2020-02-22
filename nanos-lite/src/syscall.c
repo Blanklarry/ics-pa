@@ -9,8 +9,8 @@ uintptr_t sys_yield() {
 }
 
 uintptr_t sys_exit(_Context *c) {
-  // _halt(c->GPR2);
-  naive_uload(NULL, "/bin/init");
+  _halt(c->GPR2);
+  // naive_uload(NULL, "/bin/init");
   return 0;
 }
 

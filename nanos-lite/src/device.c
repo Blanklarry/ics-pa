@@ -6,7 +6,6 @@
 // hjx-comment:
 // all ReadFn and WriteFn can't return 0 if success!
 size_t serial_write(const void *buf, size_t offset, size_t len) {
-  _yield();
   size_t cnt = 0;
   for (cnt = 0; cnt < len; cnt++) {
     if (((char*)buf)[cnt] == '\0') {
@@ -25,14 +24,24 @@ static const char *keyname[256] __attribute__((used)) = {
   _KEYS(NAME)
 };
 
+extern int fg_pcb;
 size_t events_read(void *buf, size_t offset, size_t len) {
-  _yield();
   int key = read_key();
   int down = 0;
   size_t ret = 0;
   if (key & 0x8000) {
     key ^= 0x8000;
     down = 1;
+  }
+  if (!buf && !down) { // for schedule, up after down
+    switch (key) {
+      case _KEY_F1: fg_pcb = 1; Log("bind fg_pcb=f%d", fg_pcb); break;
+      case _KEY_F2: fg_pcb = 2; Log("bind fg_pcb=f%d", fg_pcb); break;
+      case _KEY_F3: fg_pcb = 3; Log("bind fg_pcb=f%d", fg_pcb); break;
+      case _KEY_ESCAPE: _halt(0); break;
+      default: break;
+    }
+    return 0;
   }
   if (key != _KEY_NONE) {
     ret = snprintf(buf, len, "k%c %s\n", (down ? 'd' : 'u'), keyname[key]);
@@ -62,7 +71,6 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
 // in nanos-lite, measuring unit is byte, but in am-ioe(like draw_rect()) is pixel(4 bytes).
 // One pixel store in 32 bits, R(red), G(green), B(blue), and A(alpha) each store in 8 bits,
 size_t fb_write(const void *buf, size_t offset, size_t len) {
-  _yield();
   int w = screen_width();
   int h = screen_height();
   int fb_size = w * h * 4; // *32bit

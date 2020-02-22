@@ -1,6 +1,7 @@
 #include "rtl/rtl.h"
 
 #define GateDesc_SIZE 8
+#define IRQ_TIMER     32     // for x86
 
 // hjx-comment:
 // about struct GateDesc(in x86)
@@ -15,6 +16,7 @@ void raise_intr(uint32_t NO, vaddr_t ret_addr) {
    * That is, use ``NO'' to index the IDT.
    */
   rtl_push(&cpu.eflags.val);
+  reg_flag(IF) = 0;
   rtl_push(&cpu.cs);
   rtl_push(&ret_addr);
   uint32_t low_off_addr = cpu.idtr.base + GateDesc_SIZE * NO;
@@ -26,5 +28,10 @@ void raise_intr(uint32_t NO, vaddr_t ret_addr) {
 }
 
 bool isa_query_intr(void) {
+  if (reg_flag(IF) && cpu.INTR) {
+    cpu.INTR = false;
+    raise_intr(IRQ_TIMER, cpu.pc);
+    return true;
+  }
   return false;
 }

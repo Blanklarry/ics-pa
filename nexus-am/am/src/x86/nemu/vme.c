@@ -103,6 +103,7 @@ _Context *_ucontext(_AddressSpace *as, _Area ustack, _Area kstack, void *entry, 
   ustack.end = (uintptr_t *)ustack.end - 3; // stack frame of void _start(int argc, char *argv[], char *envp[])
   _Context *c = (_Context *)ustack.end - 1;
   c->as = as;
+  c->eflags |= 0x200; // IF is 10th bit(start from 1)
   c->eip = (uintptr_t)entry;
   return c;
 }

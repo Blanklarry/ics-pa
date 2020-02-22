@@ -48,6 +48,7 @@ static inline void update_pc(void) {
   else { cpu.pc = decinfo.seq_pc; }
 }
 
+bool isa_query_intr(void);
 void display_inv_msg(vaddr_t pc);
 
 #ifdef DEBUG
