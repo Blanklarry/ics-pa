@@ -19,6 +19,7 @@ static void restart() {
   // for DiffTest(in PA3, in trap)
   cpu.cs = 0x8;
   cpu.eflags.val = 0x2;
+  cpu.cr0.val = 0x60000011;
 }
 
 void init_isa(void) {

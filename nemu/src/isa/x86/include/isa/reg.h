@@ -2,6 +2,7 @@
 #define __X86_REG_H__
 
 #include "common.h"
+#include "mmu.h"
 
 #define PC_START IMAGE_START
 
@@ -71,6 +72,30 @@ typedef struct {
 		};
 		rtlreg_t val;	
 	} eflags;
+#if 0
+  union {
+		struct {
+			rtlreg_t PE :1;
+			rtlreg_t MP :1;
+			rtlreg_t EM :1;
+			rtlreg_t TS :1;
+			rtlreg_t ET :1;
+			rtlreg_t RESERVED: 26;
+			rtlreg_t PG :1;
+		};
+		rtlreg_t val;	
+	} cr0;
+
+  union {
+		struct {
+			rtlreg_t RESERVED: 12;
+			rtlreg_t PDBR :20;
+		};
+		rtlreg_t val;	
+	} cr3;
+#endif
+  CR0 cr0;
+  CR3 cr3;
 
 } CPU_state;
 
