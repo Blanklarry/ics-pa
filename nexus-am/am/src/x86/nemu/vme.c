@@ -80,12 +80,29 @@ void __am_switch(_Context *c) {
 }
 
 int _map(_AddressSpace *as, void *va, void *pa, int prot) {
+  // printf("hjx-debug: _map(): as->ptr=%p\n", as->ptr);
+  uintptr_t ppage = (uintptr_t)pa | PTE_P;
+  uintptr_t vdir = PDX(va);
+  uintptr_t vpage = PTX(va);
+  uintptr_t vp_addr = ((uintptr_t*)as->ptr)[vdir];
+  if ((vp_addr & PTE_P) == 1) {
+    vp_addr = vp_addr & 0xfffff000;
+    ((uintptr_t*)vp_addr)[vpage] = ppage;
+    // printf("hjx-debug: remap() %#x[%#x] = %#x, \n", vp_addr, vpage, ppage);
+  }
+  else {
+    PDE *npt = (PDE*)(pgalloc_usr(1));
+    ((uintptr_t*)as->ptr)[vdir] = (uintptr_t)npt | PTE_P;
+    npt[vpage] = ppage;
+    // printf("hjx-debug: newmap() %p[%#x] = %#x, \n", npt, vpage, ppage);
+  }
   return 0;
 }
 
 _Context *_ucontext(_AddressSpace *as, _Area ustack, _Area kstack, void *entry, void *args) {
   ustack.end = (uintptr_t *)ustack.end - 3; // stack frame of void _start(int argc, char *argv[], char *envp[])
   _Context *c = (_Context *)ustack.end - 1;
+  c->as = as;
   c->eip = (uintptr_t)entry;
   return c;
 }

@@ -30,7 +30,7 @@ uintptr_t sys_write(_Context *c) {
 static uintptr_t pro_brk = 0;
 uintptr_t sys_brk(_Context *c) {
   pro_brk = c->GPR2;
-  return 0;
+  return mm_brk(pro_brk, 0);
 }
 
 uintptr_t sys_open(_Context *c) {

@@ -9,6 +9,7 @@ void __am_vectrap();
 void __am_vecnull();
 
 _Context* __am_irq_handle(_Context *c) {
+  __am_get_cur_as(c);
   _Context *next = c;
   if (user_handler) {
     _Event ev = {0};
@@ -23,7 +24,7 @@ _Context* __am_irq_handle(_Context *c) {
       next = c;
     }
   }
-
+  __am_switch(next);
   return next;
 }
 
